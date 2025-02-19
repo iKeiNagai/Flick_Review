@@ -1,4 +1,4 @@
-USE flickreview;
+USE Flickreview;
 
 CREATE TABLE users (
     username VARCHAR(45) PRIMARY KEY,
@@ -19,5 +19,3 @@ CREATE TABLE reviews (
     movieID INT NOT NULL,  -- TMDb Movie ID (Not a foreign key)
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
 );
-
-SHOW TABLES;
