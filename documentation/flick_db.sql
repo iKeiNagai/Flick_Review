@@ -1,4 +1,5 @@
 --updated schema
+
 USE Flickreview;
 
 CREATE TABLE users (
