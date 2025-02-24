@@ -48,6 +48,11 @@ app.get("/home", async(req,res) => {
   }
 })
 
+app.get("/home/:genre", (req,res) =>{
+  const mgenre = req.params.genre;
+  res.render("genre", {mgenre});
+})
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
