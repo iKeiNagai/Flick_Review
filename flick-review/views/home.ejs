@@ -16,7 +16,7 @@
     <h1>Movie Genres</h1>
     <ul>
     <% movie_genre.forEach(genre => { %>
-        <li><button><%= genre.name %></button></li>
+        <li><button><a href="/home/<%=genre.name%>"><%= genre.name %></a></button></li>
     <% }) %>
     </ul>
 
