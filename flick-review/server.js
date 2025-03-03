@@ -1,4 +1,9 @@
 const express = require("express");
+const axios = require('axios')
+require('dotenv').config()
+
+const app = express();
+const PORT = 3000;
 const admin = require("firebase-admin");
 const path = require("path");
 const cors = require("cors");
@@ -35,6 +40,31 @@ const verifyFirebaseToken = async (req, res, next) => {
     }
 };
 
+app.set('view engine', 'ejs')
+//
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+
+const base_url= "https://api.themoviedb.org/3"
+app.get("/home", async(req,res) => {
+  try{
+    const response = await axios.get(`${base_url}/genre/movie/list`, {
+      params: { api_key: process.env.API_KEY}
+    });
+
+    const movie_genre = response.data.genres;
+    res.render("home", {movie_genre})
+  }catch(error){
+    console.error("ERROR fetching", error.message)
+  }
+})
+
+app.get("/home/:genre", (req,res) =>{
+  const mgenre = req.params.genre;
+  res.render("genre", {mgenre});
+})
 // ✅ Root Route
 app.get("/", (req, res) => {
     res.send("FlickReview API is Running with Firebase & MySQL!");
