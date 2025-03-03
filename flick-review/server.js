@@ -21,24 +21,36 @@
 // });
 
 const express = require("express");
-const admin = require("firebase-admin");
-const path = require("path");
-require("dotenv").config();
+const axios = require('axios')
+require('dotenv').config()
 
-
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
-
-//initialize firebase admin sdk with credentials
-admin.initializeApp({
-  credential: admin.credential.cert(require(path.resolve(serviceAccountPath))),
-});
 const app = express();
-
 const PORT = 3000;
 
-//simple get request
-app.get('/', (req, res) =>{
-    res.send("Get request")
+app.set('view engine', 'ejs')
+//
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+
+const base_url= "https://api.themoviedb.org/3"
+app.get("/home", async(req,res) => {
+  try{
+    const response = await axios.get(`${base_url}/genre/movie/list`, {
+      params: { api_key: process.env.API_KEY}
+    });
+
+    const movie_genre = response.data.genres;
+    res.render("home", {movie_genre})
+  }catch(error){
+    console.error("ERROR fetching", error.message)
+  }
+})
+
+app.get("/home/:genre", (req,res) =>{
+  const mgenre = req.params.genre;
+  res.render("genre", {mgenre});
 })
 
 app.listen(PORT, () => {
