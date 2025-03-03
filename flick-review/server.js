@@ -52,27 +52,7 @@ app.get("/home/:genre", (req,res) =>{
   const mgenre = req.params.genre;
   res.render("genre", {mgenre});
 })
-// ✅ Root Route
-app.get("/", (req, res) => {
-    res.send("FlickReview API is Running with Firebase & MySQL!");
-});
-
-// ✅ Protected Route (Requires Firebase Authentication)
-app.get("/protected", verifyFirebaseToken, (req, res) => {
-    res.json({ message: "This is a protected route!", user: req.user });
-});
-
-// ✅ Store Firebase User in MySQL After Signup
-app.post("/register", verifyFirebaseToken, (req, res) => {
-    const { email, uid } = req.user;
-
-    const query = "INSERT INTO users (username, email) VALUES (?, ?)";
-    db.query(query, [uid, email], (err, result) => {
-        if (err) return res.status(500).json({ error: "Database error" });
-        res.json({ message: "User registered successfully!", userId: result.insertId });
-    });
-});
 
 app.listen(PORT, () => {
-    console.log(`The server is running on port ${PORT}`)
-})
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
