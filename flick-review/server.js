@@ -89,6 +89,25 @@ app.get("/genre/:id", async (req, res) => {
         res.status(500).send("Error fetching movies for this genre");
     }
 });
+// ✅ Search Route - Live Suggestions
+app.get("/search", async (req, res) => {
+    const query = req.query.query;
+
+    if (!query) {
+        return res.json([]);
+    }
+
+    try {
+        const response = await axios.get(`${base_url}/search/movie`, {
+            params: { api_key: process.env.API_KEY, query }
+        });
+
+        res.json(response.data.results.slice(0, 5)); // Send top 5 results
+    } catch (error) {
+        console.error("Error fetching search results:", error.message);
+        res.status(500).json([]);
+    }
+});
 
 // ✅ User Login
 app.post("/login", (req, res) => {

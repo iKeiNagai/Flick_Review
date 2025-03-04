@@ -31,6 +31,12 @@
     <div class="container">
         <h1>Welcome to Flick Review</h1>
 
+        <!-- 🔎 Search Bar -->
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search for a movie..." autocomplete="off">
+            <ul id="suggestions"></ul>
+        </div>
+
         <!-- 🎬 Movie Genres -->
         <h2>Genres</h2>
         <ul class="genre-list">
@@ -50,6 +56,38 @@
             <% }) %>
         </div>
     </div>
+    <!-- ✅ Search Bar Live Suggestions Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBar = document.getElementById("search-bar");
+            const suggestionsBox = document.getElementById("suggestions");
+    
+            searchBar.addEventListener("input", async function () {
+                const query = searchBar.value.trim();
+    
+                if (query.length < 2) {
+                    suggestionsBox.innerHTML = ""; // Clear suggestions if query is too short
+                    return;
+                }
+    
+                try {
+                    const response = await fetch(`/search?query=${query}`);
+                    const results = await response.json();
+    
+                    suggestionsBox.innerHTML = ""; // Clear old suggestions
+    
+                    results.slice(0, 4).forEach(movie => {  // ✅ Limit to 4 suggestions
+                        const suggestionItem = document.createElement("li");
+                        suggestionItem.textContent = movie.title;
+                        suggestionsBox.appendChild(suggestionItem);
+                    });
+    
+                } catch (error) {
+                    console.error("Error fetching search results:", error);
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
