@@ -223,3 +223,47 @@ h2 {
     margin-left: 20px;
 }
 }
+/* 🔎 Search Bar */
+.search-container {
+    position: relative;
+    width: 50%;
+    margin: 20px auto;
+}
+
+#search-bar {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+    color: black;
+}
+
+/* 🔍 Suggestions Dropdown */
+#suggestions {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 5px; /* ✅ Ensures dropdown appears below the input */
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 160px; /* ✅ Limits dropdown height to 4 items */
+    overflow-y: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* ✅ Adds a shadow for visibility */
+}
+
+#suggestions li {
+    padding: 10px;
+    cursor: pointer;
+    color: black;
+    font-size: 16px;
+}
+
+#suggestions li:hover {
+    background-color: #f0f0f0;
+}
