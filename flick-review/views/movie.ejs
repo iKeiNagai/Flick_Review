@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= movie.title %></title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <!-- Profile Button (Top Left) -->
+        <% if (user) { %>
+            <a href="/profile" class="profile-btn">👤 <%= user.username %></a>
+        <% } %>
+
+        <h1>Flick Review</h1>
+
+        <!-- Logout or Login/Signup (Top Right) -->
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/logout">Logout</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            <% } %>
+        </div>
+    </div>
+
+    <h2><%= movie.title %></h2>
+    <div>
+        <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" alt="<%= movie.title %>">
+        <p><strong>Release Date:</strong> <%= movie.release_date %></p>
+        <p><strong>Rating:</strong> <%= movie.vote_average %>/10</p>
+        <p><%= movie.overview %></p>
+        
+        <h3>Genres</h3>
+        <ul>
+            <% movie.genres.forEach(genre => { %>
+                <li><%= genre.name %></li>
+            <% }) %>
+        </ul>
+
+        <h3>Reviews</h3>
+        <div>
+            <% if (reviews.length > 0) { %>
+                <% reviews.forEach(review => { %>
+                    <div>
+                        <p><strong><%= review.username %>:</strong> <%= review.comment %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No reviews yet. Be the first to write one!</p>
+            <% } %>
+        </div>
+
+        <h3>Add a Review</h3>
+        <form action="/review" method="POST">
+            <input type="hidden" name="movieID" value="<%= movie.id %>">
+            <textarea name="comment" placeholder="Write a review..." required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
