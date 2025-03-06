@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",           // Matches settings.json
-    password: "Password",   // Matches settings.json
+    password: "",   // Matches settings.json
     database: "Flickreview", // Ensure it matches the correct database name
     port: 3306              // Matches settings.json
 });
