@@ -1,34 +1,14 @@
-// const express = require("express");
-// const admin = require("./firebase"); // Import Firebase Admin SDK
-// const app = express();
-// const PORT = 3000;
-
-// // Example: Fetch data from Firestore
-// app.get("/", async (req, res) => {
-//   try {
-//     const db = admin.firestore();
-//     const snapshot = await db.collection("your-collection").get();
-//     const data = snapshot.docs.map((doc) => doc.data());
-//     res.json(data);
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
 
 const express = require("express");
 const axios = require("axios");
-const db = require("./config/db"); // ✅ Import MySQL connection
 require("dotenv").config();
+const db = require("./config/db");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-
+const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
+const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = 3022;
 
 // ✅ Set EJS as the View Engine
 app.set("view engine", "ejs");
@@ -52,6 +32,8 @@ app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
+
+app.set('views', path.join(__dirname,'views'));
 
 const base_url = "https://api.themoviedb.org/3";
 
@@ -109,30 +91,57 @@ app.get("/search", async (req, res) => {
     }
 });
 
-// ✅ User Login
-app.post("/login", (req, res) => {
+app.get("/signup", (req, res) => {
+    res.render("login");  // Renders the signup page (auth.ejs)
+});
+ 
+// Route to handle signup POST request
+app.post("/signup", async (req, res) => {
+    const { firstName, lastName, dob, username, email, password } = req.body;
+    
+    console.log("Signup request body:", req.body); // ✅ Debugging log
+    
+    if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    try {
+        await signupUser(firstName, lastName, dob, username, email, password);
+        res.redirect("/login");
+    } catch (error) {
+        console.error("Error signing up:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");  // Renders the login.ejs view
+});
+
+app.post("/login", async (req, res) => {
     const { email, password } = req.body;
+  
+    try {
+      // Call loginUser to handle Firebase login and get user data from MySQL
+      const user = await loginUser(email, password);
+  
+      // Store user session and redirect to home
+      req.session.user = { username: user.username, email: user.email };
+      res.redirect("home");
+    } catch (error) {
+      console.error("Error logging in:", error);
+      res.status(500).send("Error logging in: " + error.message);
+    }
+  });
+  
+app.get("/profile", (req, res) => {
+    const firebaseUid = req.session.user.firebaseUid;
 
-    db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+    getUserProfile(firebaseUid, (err, user) => {
         if (err) {
-            console.error("Login Error:", err);
-            return res.status(500).send("Server error");
+            return res.status(500).send("Error fetching profile");
         }
-
-        if (results.length === 0) {
-            return res.status(401).send("User not found");
-        }
-
-        const user = results[0];
-
-        // 🚀 For now, assuming plain text passwords (HASH PASSWORDS IN REAL USE)
-        if (password !== user.password) {
-            return res.status(401).send("Incorrect password");
-        }
-
-        // ✅ Store user session
-        req.session.user = { username: user.username, email: user.email };
-        res.redirect("/");
+        res.render("profile", { user });
     });
 });
 
