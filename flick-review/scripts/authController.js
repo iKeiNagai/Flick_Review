@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
  
 
-const { db } = require("../config/db"); // Ensure db connection is imported
+const db = require("../config/db"); // Ensure db connection is imported
 
 
 // Sign up user
@@ -42,7 +42,7 @@ const signupUser = async (firstName, lastName, dob, username, email, password) =
         // Insert user into MySQL
         return new Promise((resolve, reject) => {
             db.query(
-                "INSERT INTO users (first_name, last_name, dob, username, firebase_uid) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO users (firstName, lastName, dob, username, firebase_uid) VALUES (?, ?, ?, ?, ?)",
                 [firstName, lastName, dob, username, firebaseUid],
                 (err, results) => {
                     if (err) {
