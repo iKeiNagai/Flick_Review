@@ -6,6 +6,7 @@ USE flickreview;
 
 CREATE TABLE users (
     username VARCHAR(45) PRIMARY KEY,
+    firebase_uid VARCHAR(255),
     firstName VARCHAR(45),
     lastName VARCHAR(45),
     dob DATE,
