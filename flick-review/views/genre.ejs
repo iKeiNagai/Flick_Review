@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,81 @@
     <title>Genres</title>
 </head>
 <body>
-    <h1><%=mgenre%></h1>
+    <h1>Hello</h1>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= genre %> Movies - Flick Review</title>
+    <link rel="stylesheet" href="/styles2.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="heading">
+        <div><img src="/images/hoho.png" alt="logo" class="logo-image"></div>
+        <div class="login-button">Login</div>
+    </div>
+
+    <!-- Genre Section -->
+    <div class="genre-main">
+        <div class="genre-heading">
+            <div><%= genre %></div> <!-- Dynamic Genre Name -->
+        </div>
+        
+        <!-- Sorting Options -->
+        <div class="sort-to-right">
+            <div class="sort-container">
+                <div class="sort-trigger">Sort</div>
+                <div class="sort-options">
+                    <div class="sort-option" data-sort="asc">A-Z</div>
+                    <div class="sort-option" data-sort="desc">Z-A</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie List -->
+        <div class="movie-list">
+            <% if (movies.length > 0) { %>
+                <% movies.forEach(movie => { %>
+                    <div class="movie-container">
+                        <img src="<%= movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'https://via.placeholder.com/500x750?text=No+Image' %>" 
+                             alt="<%= movie.title || 'Untitled' %>" class="movie-image">
+                        <p class="movie-title"><%= movie.title || 'Untitled' %></p>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="color: white;">No movies found for this genre.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sortAZ = document.querySelector('[data-sort="asc"]');
+            const sortZA = document.querySelector('[data-sort="desc"]');
+            const movieList = document.querySelector('.movie-list');
+
+            let movies = Array.from(movieList.children); // Get all movie elements
+
+            function displayMovies(sortedMovies) {
+                movieList.innerHTML = ''; 
+                sortedMovies.forEach(movie => movieList.appendChild(movie));
+            }
+
+            sortAZ.addEventListener("click", () => {
+                movies.sort((a, b) => a.querySelector('.movie-title').textContent.localeCompare(b.querySelector('.movie-title').textContent));
+                displayMovies(movies);
+            });
+
+            sortZA.addEventListener("click", () => {
+                movies.sort((a, b) => b.querySelector('.movie-title').textContent.localeCompare(a.querySelector('.movie-title').textContent));
+                displayMovies(movies);
+            });
+        });
+    </script>
 </body>
 </html>

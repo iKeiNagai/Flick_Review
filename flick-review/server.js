@@ -74,21 +74,49 @@ app.get("/", async (req, res) => {
 });
 
 // ✅ Fetch Movies by Genre
+// app.get("/genre/:id", async (req, res) => {
+//     const genreId = req.params.id;
+
+//     try {
+//         const response = await axios.get(`${base_url}/discover/movie`, {
+//             params: { api_key: process.env.API_KEY, with_genres: genreId },
+//         });
+
+//         const movies = response.data.results;
+//         res.render("genre", { movies });
+//     } catch (error) {
+//         console.error("ERROR fetching movies by genre:", error.message);
+//         res.status(500).send("Error fetching movies for this genre");
+//     }
+// });
+
 app.get("/genre/:id", async (req, res) => {
     const genreId = req.params.id;
 
     try {
+        // ✅ Fetch the genre list to get the genre name
+        const genresResponse = await axios.get(`${base_url}/genre/movie/list`, {
+            params: { api_key: process.env.API_KEY }
+        });
+
+        const genres = genresResponse.data.genres;
+        const genre = genres.find(g => g.id == genreId)?.name || "Unknown Genre"; // Get genre name
+
+        // ✅ Fetch movies for the selected genre
         const response = await axios.get(`${base_url}/discover/movie`, {
             params: { api_key: process.env.API_KEY, with_genres: genreId },
         });
 
         const movies = response.data.results;
-        res.render("genre", { movies });
+
+        // ✅ Pass both the genre name & movie list to `genre.ejs`
+        res.render("genre", { genre, movies });
     } catch (error) {
         console.error("ERROR fetching movies by genre:", error.message);
         res.status(500).send("Error fetching movies for this genre");
     }
 });
+
 // ✅ Search Route - Live Suggestions
 app.get("/search", async (req, res) => {
     const query = req.query.query;
