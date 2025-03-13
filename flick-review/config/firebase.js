@@ -1,6 +1,8 @@
-
 import { initializeApp } from "firebase/app";
+import dotenv from "dotenv";
 
+// Load environment variables
+dotenv.config();
 
 const firebaseConfig = {
   apiKey: process.env.PRIVATE_FIREBASE_API_KEY,
@@ -11,8 +13,6 @@ const firebaseConfig = {
   appId: process.env.PRIVATE_FIREBASE_APP_ID
 };
 
-
 const app = initializeApp(firebaseConfig);
-
 
 export default app;
