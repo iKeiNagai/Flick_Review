@@ -1,6 +1,4 @@
 // firebaseAdmin.js
-
-
 const admin = require("firebase-admin");
 
 // Path to your service account key file
