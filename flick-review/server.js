@@ -6,43 +6,42 @@ const db = require("./config/db");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
-const path = require('path');
 const app = express();
 const PORT = 3022;
 
-// ✅ Set EJS as the View Engine
+//ejs View Engine
 app.set("view engine", "ejs");
 
-// ✅ Serve Static Files (CSS, Images, JS)
+//Serve Static Files (CSS, Images, JS)
 app.use(express.static("public"));
 
-// ✅ Middleware for Form Data
+//Middleware for Form Data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Session Middleware for User Authentication
+//Session Middleware for User Authentication
 app.use(session({
     secret: "secret_key",
     resave: false,
     saveUninitialized: true
 }));
 
-// ✅ Middleware to Pass User Info to Views
+//Middleware to Pass User Info to Views
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
 
-app.set('views', path.join(__dirname,'views'));
-
 const base_url = "https://api.themoviedb.org/3";
 
-// ✅ Home Route - Fetch Movie Genres & Popular Movies
+//Home Route - Fetch Movie Genres & Popular Movies
 app.get("/", async (req, res) => {
     try {
         const [genresResponse, moviesResponse] = await Promise.all([
-            axios.get(`${base_url}/genre/movie/list`, { params: { api_key: process.env.API_KEY } }),
-            axios.get(`${base_url}/movie/popular`, { params: { api_key: process.env.API_KEY } })
+            axios.get(`${base_url}/genre/movie/list`, { 
+                params: { api_key: process.env.API_KEY } }),
+            axios.get(`${base_url}/movie/popular`, { 
+                params: { api_key: process.env.API_KEY } })
         ]);
 
         const movie_genres = genresResponse.data.genres;
@@ -55,28 +54,12 @@ app.get("/", async (req, res) => {
     }
 });
 
-// ✅ Fetch Movies by Genre
-// app.get("/genre/:id", async (req, res) => {
-//     const genreId = req.params.id;
-
-//     try {
-//         const response = await axios.get(`${base_url}/discover/movie`, {
-//             params: { api_key: process.env.API_KEY, with_genres: genreId },
-//         });
-
-//         const movies = response.data.results;
-//         res.render("genre", { movies });
-//     } catch (error) {
-//         console.error("ERROR fetching movies by genre:", error.message);
-//         res.status(500).send("Error fetching movies for this genre");
-//     }
-// });
-
+//fetch movies using genre id
 app.get("/genre/:id", async (req, res) => {
     const genreId = req.params.id;
 
     try {
-        // ✅ Fetch the genre list to get the genre name
+        //Fetch the genre list to get the genre name
         const genresResponse = await axios.get(`${base_url}/genre/movie/list`, {
             params: { api_key: process.env.API_KEY }
         });
@@ -84,14 +67,14 @@ app.get("/genre/:id", async (req, res) => {
         const genres = genresResponse.data.genres;
         const genre = genres.find(g => g.id == genreId)?.name || "Unknown Genre"; // Get genre name
 
-        // ✅ Fetch movies for the selected genre
+        //Fetch movies for the selected genre
         const response = await axios.get(`${base_url}/discover/movie`, {
             params: { api_key: process.env.API_KEY, with_genres: genreId },
         });
 
         const movies = response.data.results;
 
-        // ✅ Pass both the genre name & movie list to `genre.ejs`
+        //Pass both the genre name & movie list to `genre.ejs`
         res.render("genre", { genre, movies });
     } catch (error) {
         console.error("ERROR fetching movies by genre:", error.message);
@@ -99,7 +82,7 @@ app.get("/genre/:id", async (req, res) => {
     }
 });
 
-// ✅ Search Route - Live Suggestions
+// Search Route - Live Suggestions
 app.get("/search", async (req, res) => {
     const query = req.query.query;
 
@@ -119,15 +102,13 @@ app.get("/search", async (req, res) => {
     }
 });
 
+//sign up using firebase
 app.get("/signup", (req, res) => {
     res.render("login");  // Renders the signup page (auth.ejs)
-});
- 
-// Route to handle signup POST request
-app.post("/signup", async (req, res) => {
+}).post("/signup", async (req, res) => { //post
     const { firstName, lastName, dob, username, email, password } = req.body;
     
-    console.log("Signup request body:", req.body); // ✅ Debugging log
+    console.log("Signup request body:", req.body); // Debugging log
     
     if (!email || !password) {
         return res.status(400).json({ error: "Email and password are required" });
@@ -142,11 +123,10 @@ app.post("/signup", async (req, res) => {
     }
 });
 
+//login using firebase
 app.get("/login", (req, res) => {
     res.render("login");  // Renders the login.ejs view
-});
-
-app.post("/login", async (req, res) => {
+}).post("/login", async (req, res) => {
     const { email, password } = req.body;
   
     try {
@@ -173,14 +153,14 @@ app.get("/profile", (req, res) => {
     });
 });
 
-// ✅ User Logout
+// User Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect("/");
     });
 });
 
-// ✅ Movie Details Page with Reviews
+// Movie Details Page with Reviews
 app.get("/movie/:id", async (req, res) => {
     const movieId = req.params.id;
 
@@ -191,7 +171,7 @@ app.get("/movie/:id", async (req, res) => {
 
         const movie = response.data;
 
-        // ✅ Fetch Reviews from MySQL
+        // Fetch Reviews from MySQL
         db.query("SELECT * FROM reviews WHERE movieID = ?", [movieId], (err, reviews) => {
             if (err) {
                 console.error("Error fetching reviews:", err);
@@ -207,7 +187,7 @@ app.get("/movie/:id", async (req, res) => {
     }
 });
 
-// ✅ Submit a Review
+//Submit a Review
 app.post("/review", (req, res) => {
     if (!req.session.user) {
         return res.status(401).send("You must be logged in to write a review");
@@ -228,7 +208,7 @@ app.post("/review", (req, res) => {
     );
 });
 
-// ✅ Start Server
+//Start Server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
