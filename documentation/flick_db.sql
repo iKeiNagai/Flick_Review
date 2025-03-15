@@ -10,7 +10,9 @@ CREATE TABLE users (
     firstName VARCHAR(45),
     lastName VARCHAR(45),
     dob DATE,
-    role VARCHAR(20),
+    role VARCHAR(20) DEFAULT 'user',
+    created_at TIMESTAMP 
+        DEFAULT CURRENT_TIMESTAMP,
     lastLogin TIMESTAMP 
         DEFAULT CURRENT_TIMESTAMP 
         ON UPDATE CURRENT_TIMESTAMP
