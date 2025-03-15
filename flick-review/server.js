@@ -134,8 +134,12 @@ app.get("/login", (req, res) => {
       const user = await loginUser(email, password);
   
       // Store user session and redirect to home
-      req.session.user = { username: user.username, email: user.email };
-      res.redirect("home");
+      req.session.user = { 
+        username: user.username, 
+        firebase_uid: user.firebase_uid
+     };
+
+      res.redirect("/");
     } catch (error) {
       console.error("Error logging in:", error);
       res.status(500).send("Error logging in: " + error.message);
@@ -155,8 +159,22 @@ app.get("/profile", (req, res) => {
 
 // User Logout
 app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/");
+    const firebase_uid = req.session.user.firebase_uid;
+
+    const sql = `UPDATE users SET lastLogin = NOW() WHERE firebase_uid = ?`;
+
+    db.query(sql, [firebase_uid], (err, result) => {
+        if (err) {
+            console.error("Error updating lastLogin:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        
+        console.log(result);
+
+        //Destroy session after updating lastLogin
+        req.session.destroy(() => {
+            res.redirect("/");
+        });
     });
 });
 
@@ -211,4 +229,9 @@ app.post("/review", (req, res) => {
 //Start Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+});
+
+app.get("/session-data", (req, res) => {
+    console.log("Session Data:", req.session);
+    res.send(req.session);
 });
