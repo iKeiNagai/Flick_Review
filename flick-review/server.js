@@ -226,6 +226,23 @@ app.post("/review", (req, res) => {
     );
 });
 
+app.post("/edit-review", (req,res) =>{
+    const {  movieID, reviewId, text, e_rating} = req.body;
+
+    const sql = `UPDATE reviews SET text = ?, rating = ? WHERE reviewId = ? `;
+    db.query(sql, [text,e_rating,reviewId], (err, result) => {
+        if (err) {
+            console.error("Error updating review:", err);
+            return res.status(500).send("Error updating review");
+        }
+        console.log(result);
+        console.log(reviewId, text, e_rating);
+        console.log("reqparams:", req.body);
+        res.redirect(`/movie/${movieID}`);
+    });
+
+})
+
 //Start Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

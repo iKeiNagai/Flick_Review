@@ -72,11 +72,45 @@
                         <p><strong><%= review.username %> :</strong>
                         <%= review.text %>, rating:
                         <%= review.rating %></p>
+                        
+                        <% if (user && user.username === review.username) { %>
+                            <button onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
+                        <% } %>
                     </div>
                 <% }) %>
             <% } else { %>
                 <p>No reviews yet. Be the first to write one!</p>
             <% } %>
+        </div>
+
+        <div id="updateReview" style="display: none;">
+            <h4>Edit Review</h4>
+
+            <form action="/edit-review" method="POST">
+                <input type="hidden" name="movieID" value="<%= movie.id %>">
+                <input type="hidden" id="reviewId" name="reviewId">
+                <textarea id="reviewText" name="text"></textarea>
+
+                <div class="rating">
+                    <input type="radio" id="star5_e" name="e_rating" value="5">
+                    <label for="star5_e">&#9733;</label>
+    
+                    <input type="radio" id="star4_e" name="e_rating" value="4">
+                    <label for="star4_e">&#9733;</label>
+    
+                    <input type="radio" id="star3_e" name="e_rating" value="3">
+                    <label for="star3_e">&#9733;</label>
+    
+                    <input type="radio" id="star2_e" name="e_rating" value="2">
+                    <label for="star2_e">&#9733;</label>
+    
+                    <input type="radio" id="star1_e" name="e_rating" value="1" required>
+                    <label for="star1_e">&#9733;</label>
+                </div>
+
+                <button type="submit">Update</button>
+                <button type="button" onclick="cancelEdit()">Cancel</button>
+            </form>
         </div>
 
         <h3>Add a Review</h3>
@@ -103,5 +137,23 @@
             <button type="submit">Submit</button>
         </form>
     </div>
+
+    <script>
+        function editReview(id, text, rating) {
+            document.getElementById('updateReview').style.display = 'block';
+            document.getElementById('reviewId').value = id;
+            document.getElementById('reviewText').value = text;
+
+            document.querySelectorAll('input[name="e_rating"]').forEach(radio => {
+                if (radio.value == rating) {
+                    radio.checked = true;
+                }
+            });
+        }
+        
+        function cancelEdit() {
+            document.getElementById('updateReview').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
