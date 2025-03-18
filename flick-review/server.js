@@ -243,6 +243,83 @@ app.post("/edit-review", (req,res) =>{
 
 })
 
+app.get("/rating/:review_Id/:username", async (req,res) => {
+    const { review_Id, username } = req.params;
+    let type = "none";
+
+    //checks existing like
+    const existing = await db.promise().query(
+        `SELECT type FROM likes WHERE username = ? AND reviewId = ?`,
+        [username, review_Id]
+    );
+    console.log("existingggggg");
+
+    if(existing[0].length > 0){
+        type = existing[0][0].type;
+    }
+
+    //checks like/dislike counts
+    const counts = await db.promise().query(
+        `SELECT 
+            SUM(type = 'like') AS totalLikes, 
+            SUM(type = 'dislike') AS totalDislikes
+        FROM likes WHERE reviewId = ?`,
+        [review_Id]
+    );
+
+    console.log(counts);
+
+    res.json({
+        totalLikes: counts[0][0].totalLikes || 0,
+        totalDislikes: counts[0][0].totalDislikes || 0,
+        userAction: type
+    });
+})
+
+app.post("/rating/:review_Id/:type/:username", async (req,res) => {
+    const { review_Id, type, username } = req.params;
+
+    console.log(review_Id,type,username);
+
+    try {
+        //checks existing like/dislike
+        const existing = await db.promise().query(
+            `SELECT type FROM likes WHERE username = ? AND reviewId = ?`,
+            [username, review_Id]
+        );
+        console.log(existing);
+
+        if (existing[0].length > 0) {
+            //console.log(existing[0][0].type);
+            //console.log(type);
+            if (existing[0][0].type === type) {
+                // if user toggles off action, it removes type
+                await db.promise().query(
+                    "DELETE FROM likes WHERE username = ? AND reviewId = ?",
+                    [username, review_Id]
+                );
+                console.log("removed");
+            } else {
+                // if user switches , update the action
+                await db.promise().query(
+                    "UPDATE likes SET type = ? WHERE username = ? AND reviewId = ?",
+                    [type, username, review_Id]
+                );
+                console.log("swapped");
+            }
+        } else {
+            // if no existing record, insert a new like/dislike
+            await db.promise().query(
+                "INSERT INTO likes (username, reviewId, type) VALUES (?, ?, ?)",
+                [username, review_Id, type]
+            );
+            console.log("inserted");
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Database error", details: error });
+    }
+})
+
 //Start Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

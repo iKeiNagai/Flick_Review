@@ -37,8 +37,10 @@ CREATE TABLE likes (
     likeId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(45) NOT NULL,
     reviewId INT NOT NULL,
+    type ENUM('like', 'dislike') NOT NULL,
     dateLiked DATETIME NOT NULL 
         DEFAULT CURRENT_TIMESTAMP,
+        ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (username) REFERENCES users(username) 
         ON DELETE CASCADE,
     FOREIGN KEY (reviewId) REFERENCES reviews(reviewId) 
