@@ -92,7 +92,7 @@
         <div>
             <% if (reviews.length > 0) { %>
                 <% reviews.forEach(review => { %>
-                    <div class="review" data-username="<%= user.username %>" data-review-id="<%= review.reviewId %>">
+                    <div class="review" data-username="<%= user ? user.username : 'Guest' %>" data-review-id="<%= review.reviewId %>">
                         
                         <p><strong><%= review.username %> :</strong>
                         <%= review.text %>, rating:
@@ -101,7 +101,8 @@
                         <% if (user && user.username === review.username) { %>
                             <button onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
                         <% } %>
-
+                        
+                        <% if(user){ %>
                         <div class="rating-container">
                             <div class="review-rating like">
                                 <span class="rating-button material-icons">thumb_up</span>
@@ -112,6 +113,7 @@
                                 <span class="rating-count"></span>
                             </div>
                         </div>
+                        <% }%>
                     </div>
                 <% }) %>
             <% } else { %>
