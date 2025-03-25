@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Flick Review</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    <!-- ✅ Navbar with Profile & Logout -->
+    <div class="navbar">
+        <% if (user) { %>
+            <a href="/profile" class="profile-btn">👤 <%= user.username %></a>
+        <% } %>
+
+        <h1>Flick Review</h1>
+
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/logout">Logout</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- ✅ Profile Container -->
+    <div class="container">
+        <% if (user) { %>
+            <div class="profile-header">
+                <img src="<%= user.profile_picture || '/images/default-avatar.png' %>" alt="Profile Picture" class="profile-pic">
+                <h2><%= user.username %></h2>
+                <p><%= user.name %></p>
+            </div>
+
+            <!-- ✅ Past Reviews -->
+            <h2>Past Reviews</h2>
+            <div class="review-list">
+                <% if (user.reviews.length === 0) { %>
+                    <p>No reviews yet.</p>
+                <% } else { %>
+                    <% user.reviews.forEach(review => { %>
+                        <div class="review-card">
+                            <p><strong><%= review.movie_title %></strong></p>
+                            <p>Rating: ⭐ <%= review.rating %>/5</p>
+                            <p><em><%= review.content %></em></p>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        <% } else { %>
+            <p>You need to <a href="/login">log in</a> to view your profile.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>
