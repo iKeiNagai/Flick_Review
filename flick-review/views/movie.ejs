@@ -220,6 +220,8 @@
             likeCount.textContent = ratingStatus.totalLikes;
             dislikeCount.textContent = ratingStatus.totalDislikes;
             
+            let isLiked = ratingStatus.userAction === "like";
+            let isDisliked = ratingStatus.userAction === "dislike";
             
             ratings.forEach(rating => {
                 const button = rating.querySelector(".rating-button");
@@ -238,25 +240,32 @@
                         //like counter logic
                         if (type === "like") {
                             likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                            isLiked = false;
                         } else {
                             dislikeCount.textContent = parseInt(dislikeCount.textContent) - 1;
+                            isDisliked = false;
                         }
                     }else {
                         // if not selected, toggle it on
                         ratings.forEach(rating => rating.classList.remove("rating-selected"));
                         rating.classList.add("rating-selected");
 
+
                         //like counter logic
                         if (type === "like") {
-                            if (dislikeCount.textContent > 0) {
+                            if (isDisliked) {
                                 dislikeCount.textContent = parseInt(dislikeCount.textContent) - 1; // Decrease dislike count if dislike was selected
+                                isDisliked = false;
                             }
                             likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                            isLiked = true;
                         } else {
-                            if (likeCount.textContent > 0) {
+                            if (isLiked) {
                                 likeCount.textContent = parseInt(likeCount.textContent) - 1; // Decrease like count if like was selected
+                                isLiked = false;
                             }
                             dislikeCount.textContent = parseInt(dislikeCount.textContent) + 1;
+                            isDisliked = true;
                         }
                     }
                     
