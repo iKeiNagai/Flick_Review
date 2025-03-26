@@ -196,6 +196,11 @@ app.get("/movie/:id", async (req, res) => {
                 return res.status(500).send("Error fetching reviews");
             }
 
+            //return json in test mode
+            if (process.env.NODE_ENV === "test") {
+                return res.json({ movie, reviews });
+            }
+
             res.render("movie", { movie, reviews });
         });
 
@@ -329,3 +334,5 @@ app.get("/session-data", (req, res) => {
     console.log("Session Data:", req.session);
     res.send(req.session);
 });
+
+module.exports = app;
