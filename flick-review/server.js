@@ -5,7 +5,7 @@ require("dotenv").config();
 const db = require("./config/db");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
+//const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
 const app = express();
 const PORT = 3022;
 
@@ -326,9 +326,11 @@ app.post("/rating/:review_Id/:type/:username", async (req,res) => {
 })
 
 //Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
 
 app.get("/session-data", (req, res) => {
     console.log("Session Data:", req.session);
