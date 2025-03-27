@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- ✅ Navbar with Profile & Logout -->
+    <!--  Navbar with Profile & Logout -->
     <div class="navbar">
         <!-- Profile Button (Top Left) -->
         <% if (user) { %>
@@ -31,13 +31,13 @@
     <div class="container">
         <h1>Welcome to Flick Review</h1>
 
-        <!-- 🔎 Search Bar -->
+        <!--  Search Bar -->
         <div class="search-container">
             <input type="text" id="search-bar" placeholder="Search for a movie..." autocomplete="off">
             <ul id="suggestions"></ul>
         </div>
 
-        <!-- 🎬 Movie Genres -->
+        <!--  Movie Genres -->
         <h2>Genres</h2>
         <ul class="genre-list">
             <% movie_genres.forEach(genre => { %>
@@ -45,7 +45,7 @@
             <% }) %>
         </ul>
 
-        <!-- 🍿 Popular Movies -->
+        <!--  Popular Movies -->
         <h2>Popular Movies</h2>
         <div class="movie-list">
             <% popular_movies.forEach(movie => { %>
@@ -56,7 +56,7 @@
             <% }) %>
         </div>
     </div>
-    <!-- ✅ Search Bar Live Suggestions Script -->
+    <!--  Search Bar Live Suggestions Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const searchBar = document.getElementById("search-bar");
