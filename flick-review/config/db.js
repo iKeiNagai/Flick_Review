@@ -8,13 +8,13 @@ const db = mysql.createConnection({
     port: 3306              // Matches settings.json
 });
 
-// ✅ Connect to MySQL
+//  Connect to MySQL
 db.connect(err => {
     if (err) {
         console.error("❌ MySQL Connection Error:", err);
         return;
     }
-    console.log("✅ Connected to MySQL Database: Flickreview");
+    console.log(" Connected to MySQL Database: Flickreview");
 });
 
 module.exports = db;

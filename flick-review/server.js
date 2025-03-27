@@ -30,24 +30,24 @@ const bodyParser = require("body-parser");
 const app = express();
 const PORT = 3000;
 
-// ✅ Set EJS as the View Engine
+// Set EJS as the View Engine
 app.set("view engine", "ejs");
 
-// ✅ Serve Static Files (CSS, Images, JS)
+// Serve Static Files (CSS, Images, JS)
 app.use(express.static("public"));
 
-// ✅ Middleware for Form Data
+//  Middleware for Form Data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Session Middleware for User Authentication
+//  Session Middleware for User Authentication
 app.use(session({
     secret: "secret_key",
     resave: false,
     saveUninitialized: true
 }));
 
-// ✅ Middleware to Pass User Info to Views
+//  Middleware to Pass User Info to Views
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 
 const base_url = "https://api.themoviedb.org/3";
 
-// ✅ Home Route - Fetch Movie Genres & Popular Movies
+//  Home Route - Fetch Movie Genres & Popular Movies
 app.get("/", async (req, res) => {
     try {
         const [genresResponse, moviesResponse] = await Promise.all([
@@ -73,7 +73,7 @@ app.get("/", async (req, res) => {
     }
 });
 
-// ✅ Fetch Movies by Genre
+//  Fetch Movies by Genre
 app.get("/genre/:id", async (req, res) => {
     const genreId = req.params.id;
 
@@ -89,7 +89,7 @@ app.get("/genre/:id", async (req, res) => {
         res.status(500).send("Error fetching movies for this genre");
     }
 });
-// ✅ Search Route - Live Suggestions
+//  Search Route - Live Suggestions
 app.get("/search", async (req, res) => {
     const query = req.query.query;
 
@@ -109,7 +109,7 @@ app.get("/search", async (req, res) => {
     }
 });
 
-// ✅ User Login
+//  User Login
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
@@ -130,20 +130,20 @@ app.post("/login", (req, res) => {
             return res.status(401).send("Incorrect password");
         }
 
-        // ✅ Store user session
+        //  Store user session
         req.session.user = { username: user.username, email: user.email };
         res.redirect("/");
     });
 });
 
-// ✅ User Logout
+//  User Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect("/");
     });
 });
 
-// ✅ Movie Details Page with Reviews
+//  Movie Details Page with Reviews
 app.get("/movie/:id", async (req, res) => {
     const movieId = req.params.id;
 
@@ -154,7 +154,7 @@ app.get("/movie/:id", async (req, res) => {
 
         const movie = response.data;
 
-        // ✅ Fetch Reviews from MySQL
+        //  Fetch Reviews from MySQL
         db.query("SELECT * FROM reviews WHERE movieID = ?", [movieId], (err, reviews) => {
             if (err) {
                 console.error("Error fetching reviews:", err);
@@ -170,7 +170,7 @@ app.get("/movie/:id", async (req, res) => {
     }
 });
 
-// ✅ Submit a Review
+//  Submit a Review
 app.post("/review", (req, res) => {
     if (!req.session.user) {
         return res.status(401).send("You must be logged in to write a review");
@@ -191,7 +191,7 @@ app.post("/review", (req, res) => {
     );
 });
 
-// ✅ Start Server
+//  Start Server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
