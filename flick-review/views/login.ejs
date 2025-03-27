@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup</title>
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+        .tab-content {
+            display: none;
+        }
+        .active-tab {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <!-- Tabs to switch between Login and Signup -->
+        <div class="tabs">
+            <span id="login-tab">Login</span>
+            <span id="signup-tab">Sign Up</span>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="tab-content active-tab">
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="tab-content">
+            <h2>Sign Up</h2>
+            <form action="/signup" method="POST">
+                <input type="text" name="firstName" placeholder="First Name" required>
+                <input type="text" name="lastName" placeholder="Last Name" required>
+                <input type="date" name="dob" required>
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Sign Up</button>
+            </form>
+            
+            
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to toggle between login and signup forms
+        document.getElementById('login-tab').addEventListener('click', function() {
+            document.getElementById('login-form').classList.add('active-tab');
+            document.getElementById('signup-form').classList.remove('active-tab');
+        });
+
+        document.getElementById('signup-tab').addEventListener('click', function() {
+            document.getElementById('signup-form').classList.add('active-tab');
+            document.getElementById('login-form').classList.remove('active-tab');
+        });
+    </script>
+
+</body>
+</html>
