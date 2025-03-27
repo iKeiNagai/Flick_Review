@@ -1,4 +1,4 @@
-const { initializeApp } = require("firebase/app");
+const admin = require("../config/firebaseAdmin");
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth");
 
 require("dotenv").config();
