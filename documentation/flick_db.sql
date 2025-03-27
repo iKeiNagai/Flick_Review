@@ -6,10 +6,13 @@ USE flickreview;
 
 CREATE TABLE users (
     username VARCHAR(45) PRIMARY KEY,
+    firebase_uid VARCHAR(255),
     firstName VARCHAR(45),
     lastName VARCHAR(45),
     dob DATE,
-    role VARCHAR(20),
+    role VARCHAR(20) DEFAULT 'user',
+    created_at TIMESTAMP 
+        DEFAULT CURRENT_TIMESTAMP,
     lastLogin TIMESTAMP 
         DEFAULT CURRENT_TIMESTAMP 
         ON UPDATE CURRENT_TIMESTAMP
@@ -34,8 +37,10 @@ CREATE TABLE likes (
     likeId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(45) NOT NULL,
     reviewId INT NOT NULL,
+    type ENUM('like', 'dislike') NOT NULL,
     dateLiked DATETIME NOT NULL 
         DEFAULT CURRENT_TIMESTAMP,
+        ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (username) REFERENCES users(username) 
         ON DELETE CASCADE,
     FOREIGN KEY (reviewId) REFERENCES reviews(reviewId) 
