@@ -52,6 +52,14 @@
         .review-rating:not(.rating-selected) > .rating-button:hover{
             color: bisque;
         }
+
+        .report{
+            all: unset;
+        }
+        .report:hover{
+            color: red;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -67,6 +75,9 @@
         <!-- Logout or Login/Signup (Top Right) -->
         <div class="nav-links">
             <% if (user) { %>
+                <% if (user.role === 'mod') { %>
+                   <a href="">Reports</a>
+                <% } %>
                 <a href="/change-role">Change Role</a>
                 <a href="/logout">Logout</a>
             <% } else { %>
@@ -91,6 +102,31 @@
         </ul>
 
         <h3>Reviews</h3>
+        <div id="reportForm" style="display: none;">
+            <h4>Report Review</h4>
+            
+            <form action="/report" method="POST">
+                <input type="hidden" name="movieID" value="<%= movie.id %>">
+                <input type="hidden" name="targetReviewId" id="targetReviewId">
+
+                <label>
+                    <input type="radio" name="reportReason" value="inappropriate" required>
+                    Inappropriate
+                </label><br>
+                <label>
+                    <input type="radio" name="reportReason" value="spam" required>
+                    Spam
+                </label><br>
+                <label>
+                    <input type="radio" name="reportReason" value="irrelevant" required>
+                    Irrelevant
+                </label><br>
+                
+                <button type="submit">Submit</button>
+                <button onclick="hideForm()">Cancel</button>
+            </form>
+        </div>
+
         <div>
             <% if (reviews.length > 0) { %>
                 <% reviews.forEach(review => { %>
@@ -103,7 +139,13 @@
                         <% if (user && user.username === review.username) { %>
                             <button onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
                         <% } %>
-                        
+
+                        <% if (user && user.username != review.username) { %>
+                            <button class="report" onclick="report('<%= review.reviewId %>')">
+                                <span class="material-icons">flag</span>
+                            </button>
+                        <% } %>
+
                         <% if(user){ %>
                         <div class="rating-container">
                             <div class="review-rating like">
@@ -193,6 +235,16 @@
         
         function cancelEdit() {
             document.getElementById('updateReview').style.display = 'none';
+        }
+    </script>
+    <script>
+        function report(reviewId){
+            document.getElementById('reportForm').style.display = 'block';
+            document.getElementById("targetReviewId").value = reviewId;
+        }
+
+        function hideForm(){
+            document.getElementById('reportForm').style.display = 'none';
         }
     </script>
     <script>
