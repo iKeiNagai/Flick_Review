@@ -5,7 +5,7 @@ require("dotenv").config();
 const db = require("./config/db");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-//const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
+const { loginUser, getUserProfile, signupUser } = require("./scripts/authController"); // Destructure the functions from auth.js
 const app = express();
 const PORT = 3022;
 
@@ -136,7 +136,8 @@ app.get("/login", (req, res) => {
       // Store user session and redirect to home
       req.session.user = { 
         username: user.username, 
-        firebase_uid: user.firebase_uid
+        firebase_uid: user.firebase_uid,
+        role: user.role
      };
 
       res.redirect("/");
@@ -324,6 +325,24 @@ app.post("/rating/:review_Id/:type/:username", async (req,res) => {
         res.status(500).json({ error: "Database error", details: error });
     }
 })
+
+//moderator
+app.get("/change-role", (req,res) =>{
+    const change_to = req.session.user.role === 'user' ? 'mod' : 'user';
+    const username = req.session.user.username;
+
+    const sql = 'UPDATE users SET role = ? WHERE username = ?';
+
+    db.query(sql, [change_to, username], (err, result) => {
+        if (err) {
+            console.error("Error updating role:", err);
+            return res.status(500).send("Error updating role");
+        }
+
+        req.session.user.role = change_to;
+        res.redirect(`/`);
+    });
+});
 
 //Start Server
 if (process.env.NODE_ENV !== "test") {
