@@ -344,6 +344,23 @@ app.get("/change-role", (req,res) =>{
     });
 });
 
+app.post("/report", (req,res) => {
+    const { movieID, reportReason, targetReviewId } = req.body;
+    const reporterUsername = req.session.user.username;
+
+    const sql= `INSERT INTO reported_reviews (reporterUsername, targetReviewId, reportReason) 
+        VALUES (?, ?, ?)`;
+
+    db.query(sql, [reporterUsername, targetReviewId, reportReason], (err, result) => {
+        if (err) {
+            console.error("Error submitting report:", err);
+            return res.status(500).send("Error submitting report.");
+        }
+
+        res.redirect(`/movie/${movieID}`);
+    });
+})
+
 //Start Server
 if (process.env.NODE_ENV !== "test") {
     app.listen(PORT, () => {
