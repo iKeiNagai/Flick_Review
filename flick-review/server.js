@@ -344,7 +344,47 @@ app.get("/change-role", (req,res) =>{
     });
 });
 
-app.post("/report", (req,res) => {
+app.get("/report", (req,res) => {
+
+    if (!req.session.user || req.session.user.role !== "mod") {
+        return res.status(403).send("Access denied. Only moderators can view reports.");
+    }
+    
+    const pendingQuery = `
+        SELECT rr.reportId, rr.reporterUsername, rr.targetReviewId, rr.reportReason, rr.reportTimestamp, rr.reportStatus, 
+               r.text AS reviewText, r.username AS reviewAuthor, r.movieID AS movieID
+        FROM reported_reviews rr
+        JOIN reviews r ON rr.targetReviewId = r.reviewId
+        WHERE rr.reportStatus = 'Pending'
+        ORDER BY rr.reportTimestamp DESC`;
+
+    const resolvedQuery =`
+        SELECT rr.reportId, rr.reporterUsername, rr.targetReviewId, rr.reportReason, rr.reportTimestamp, rr.reportStatus, 
+               r.text AS reviewText, r.username AS reviewAuthor, r.movieID AS movieID
+        FROM reported_reviews rr
+        JOIN reviews r ON rr.targetReviewId = r.reviewId
+        WHERE rr.reportStatus != 'Pending'
+        ORDER BY rr.reportTimestamp DESC`;
+    
+    db.query(pendingQuery,(err, pendingReports) => {
+        if (err) {
+            console.error("Error fetching pending reports:", err);
+            return res.status(500).send("Error fetching pending reports");
+        }
+
+        db.query(resolvedQuery, (err, resolvedReports) => {
+            if (err) {
+                console.error("Error fetching resolved reports:", err);
+                return res.status(500).send("Error fetching resolved reports.");
+            }
+
+            console.log(pendingReports);
+            console.log(resolvedReports);
+            res.render("report", { pendingReports, resolvedReports});
+        });
+    })
+
+}).post("/report", (req,res) => {
     const { movieID, reportReason, targetReviewId } = req.body;
     const reporterUsername = req.session.user.username;
 
