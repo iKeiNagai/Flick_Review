@@ -13,6 +13,20 @@
         table, th, td {
             border: 1px solid white;
         }
+
+        button{
+            all: unset;
+        }
+
+        .reviewed:hover{
+            color: red;
+            cursor: pointer;
+            
+        }
+        .dismissed:hover{
+            color: green;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -61,7 +75,7 @@
                         <td><%= report.reportId %></td>
                         <td><%= report.reporterUsername %></td>
                         <td><%= report.reviewAuthor %></td>
-                        <td><%= report.reviewText %></td>
+                        <td><a href="/movie/<%= report.movieID %>"><%= report.reviewText %></a></td>
                         <td><%= report.reportReason %></td>
                         <td><%= new Date(report.reportTimestamp).toLocaleString("en-US", { 
                                 hour: "2-digit", minute: "2-digit", hour12: false, 
@@ -70,8 +84,17 @@
                         </td>
                         <td><%= report.reportStatus %></td>
                         <td>
-                            <span class="material-icons">delete</span>
-                            <span class="material-icons">done</span>
+                            <form action="/moderate" method="POST">
+                                <input type="hidden" name="reportId" value="<%= report.reportId %>">
+                                <input type="hidden" name="reviewId" value="<%= report.targetReviewId %>">
+
+                                <button type="submit" name="action" value="Reviewed" class="reviewed">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                                <button type="submit" name="action" value="Dismissed" class="dismissed">
+                                    <span class="material-icons">done</span>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 <% }) %>
@@ -92,14 +115,13 @@
                     <th>Reason</th>
                     <th>Timestamp</th>
                     <th>Status</th>
-                    <th>Action</th>
                 </tr>
                 <% resolvedReports.forEach(report => { %>
                     <tr>
                         <td><%= report.reportId %></td>
                         <td><%= report.reporterUsername %></td>
                         <td><%= report.reviewAuthor %></td>
-                        <td><%= report.reviewText %></td>
+                        <td><a href="/movie/<%= report.movieID %>"><%= report.reviewText %></a></td>
                         <td><%= report.reportReason %></td>
                         <td><%= new Date(report.reportTimestamp).toLocaleString("en-US", { 
                             hour: "2-digit", minute: "2-digit", hour12: false, 
