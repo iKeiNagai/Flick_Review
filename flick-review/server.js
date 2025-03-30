@@ -32,6 +32,12 @@ app.use((req, res, next) => {
     next();
 });
 
+//Disable caching for all routes
+app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    next();
+});
+
 const base_url = "https://api.themoviedb.org/3";
 
 //Home Route - Fetch Movie Genres & Popular Movies
