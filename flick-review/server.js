@@ -191,7 +191,7 @@ app.get("/movie/:id", async (req, res) => {
         const movie = response.data;
 
         // Fetch Reviews from MySQL
-        db.query("SELECT * FROM reviews WHERE movieID = ?", [movieId], (err, reviews) => {
+        db.query("SELECT * FROM reviews WHERE movieID = ? AND isHidden = FALSE", [movieId], (err, reviews) => {
             if (err) {
                 console.error("Error fetching reviews:", err);
                 return res.status(500).send("Error fetching reviews");
@@ -398,6 +398,56 @@ app.get("/report", (req,res) => {
         }
 
         res.redirect(`/movie/${movieID}`);
+    });
+})
+
+app.post("/moderate", (req,res) =>{
+    console.log(req.body);
+
+    const { reportId, reviewId ,action } = req.body;
+    const adminUsername = req.session.user.username;
+
+    let updateQuery, queryParams;
+    const actionType = action === "Reviewed" ? "Deleted" : "None";
+
+    const insertAdminActionQuery = `
+        INSERT INTO moderator_actions (adminUsername, actionType) 
+            VALUES (?, ?)`;
+
+    db.query(insertAdminActionQuery, [adminUsername, actionType], (err,result) => {
+        if (err) {
+            console.error("Error inserting moderator action", err);
+            return res.status(500).send("Error inserting moderator action");
+        }
+
+        const actionId = result.insertId;
+
+        if(action === "Reviewed"){
+            updateQuery = `
+                UPDATE reviews SET isHidden = TRUE WHERE reviewId = ?;
+                UPDATE reported_reviews 
+                    SET reportStatus = ?, adminActionId = ?
+                        WHERE reportId = ?;
+            `;
+            queryParams =[reviewId ,action, actionId, reportId];
+        }else if(action === 'Dismissed'){
+            updateQuery = `
+                UPDATE reported_reviews 
+                    SET reportStatus = ?, adminActionId = ?
+                        WHERE reportId = ?
+            `;
+            queryParams = [action, actionId, reportId];
+        }
+
+        db.query(updateQuery, queryParams, (err) => {
+            if (err) {
+                console.error("Error updating report:", err);
+                return res.status(500).send("Error updating report.");
+            }
+
+            res.redirect("/report");
+        });
+
     });
 })
 

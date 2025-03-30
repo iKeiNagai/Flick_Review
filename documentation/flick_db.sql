@@ -29,6 +29,7 @@ CREATE TABLE reviews (
     dateModified TIMESTAMP 
         DEFAULT CURRENT_TIMESTAMP 
         ON UPDATE CURRENT_TIMESTAMP,
+    isHidden BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (username) REFERENCES users(username) 
         ON DELETE CASCADE
 );
