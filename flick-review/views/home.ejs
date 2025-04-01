@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flick Review</title>
     <link rel="stylesheet" href="/styles.css">
+
 </head>
 <body>
 
@@ -20,13 +21,14 @@
         <!-- Logout or Login/Signup (Top Right) -->
         <div class="nav-links">
             <% if (user) { %>
-                <a href="/logout">Logout</a>
+                <p>Welcome, <%= user.firstName %>!</p>
+                <a href="/logout">LOGOUT</a>
             <% } else { %>
-                <a href="/login">Login</a>
-                <a href="/signup">Sign Up</a>
+                <a href="/login">LOGIN</a>
             <% } %>
         </div>
     </div>
+
 
     <div class="container">
         <h1>Welcome to Flick Review</h1>
