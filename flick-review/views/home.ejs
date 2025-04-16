@@ -34,7 +34,7 @@
         <!--  Search Bar -->
         <div class="search-container">
             <input type="text" id="search-bar" placeholder="Search for a movie..." autocomplete="off">
-            <ul id="suggestions"></ul>
+            <ul id="suggestions" class="suggestion-list"></ul>
         </div>
 
         <!--  Movie Genres -->
@@ -63,29 +63,25 @@
         document.addEventListener("DOMContentLoaded", function () {
             const searchBar = document.getElementById("search-bar");
             const suggestionsBox = document.getElementById("suggestions");
-    
-            searchBar.addEventListener("input", async function () {
+
+            searchBar.addEventListener("input", async () => {
                 const query = searchBar.value.trim();
-    
-                if (query.length < 2) {
-                    suggestionsBox.innerHTML = ""; // Clear suggestions if query is too short
+                if (!query) {
+                    suggestionsBox.innerHTML = "";
                     return;
                 }
-    
-                try {
-                    const response = await fetch(`/search?query=${query}`);
-                    const results = await response.json();
-    
-                    suggestionsBox.innerHTML = ""; // Clear old suggestions
-    
-                    results.slice(0, 4).forEach(movie => {  // ✅ Limit to 4 suggestions
-                        const suggestionItem = document.createElement("li");
-                        suggestionItem.textContent = movie.title;
-                        suggestionsBox.appendChild(suggestionItem);
-                    });
-    
-                } catch (error) {
-                    console.error("Error fetching search results:", error);
+
+                const res = await fetch(`/search?query=${encodeURIComponent(query)}`);
+                const movies = await res.json();
+
+                suggestionsBox.innerHTML = movies.map(movie =>
+                    `<li><a href="/movie/${movie.id}">${movie.title}</a></li>`
+                ).join('');
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!suggestionsBox.contains(e.target) && e.target !== searchBar) {
+                    suggestionsBox.innerHTML = "";
                 }
             });
         });
