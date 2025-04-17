@@ -197,7 +197,7 @@ app.get("/movie/:id", async (req, res) => {
         const movie = response.data;
 
         // Fetch Reviews from MySQL
-        db.query("SELECT * FROM reviews WHERE movieID = ? AND isHidden = FALSE", [movieId], (err, reviews) => {
+        db.query("SELECT * FROM reviews WHERE movieID = ? AND isHidden = FALSE ORDER BY dateCreated DESC", [movieId], (err, reviews) => {
             if (err) {
                 console.error("Error fetching reviews:", err);
                 return res.status(500).send("Error fetching reviews");
