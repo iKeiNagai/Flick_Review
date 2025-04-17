@@ -92,6 +92,39 @@
     position: relative;
 }
 
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.review-username {
+    margin-right: auto;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.review-date {
+    flex-shrink: 0;
+}
+
+.review-body {
+    text-align: center;
+    font-size: 1rem;
+    color: #f0f0f0;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 10px;
+}
+
 form {
     background-color: #1e1e1e;
     border-radius: 12px;
@@ -149,4 +182,20 @@ button[type="submit"]:hover {
 
 .cancel:hover {
     background-color: #81513e;
+}
+
+.edit{
+    background-color:  #333;
+    color: #ffcc00;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 5px;
+}
+
+.edit:hover {
+    background-color: #7b813e;
 }

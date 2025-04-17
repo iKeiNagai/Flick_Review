@@ -56,6 +56,7 @@
 
         .report{
             all: unset;
+            margin-left: 5px;
         }
         .report:hover{
             color: red;
@@ -195,21 +196,37 @@
                 <% if (reviews.length > 0) { %>
                     <% reviews.forEach(review => { %>
                         <div class="review" data-username="<%= user ? user.username : 'Guest' %>" data-review-id="<%= review.reviewId %>">
-                            
-                            <p><strong><%= review.username %> :</strong>
-                            <%= review.text %>, rating:
-                            <%= review.rating %></p>
-                            
-                            <% if (user && user.username === review.username) { %>
-                                <button onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
-                            <% } %>
+                            <div class="review-header">
+                                <span class="review-username"><%= review.username %></span>
+                                <span> Created: <%= new Date(review.dateCreated).toLocaleString("en-US", { 
+                                            hour: "2-digit", minute: "2-digit", hour12: false, 
+                                            month: "short", year: "numeric" 
+                                        }) %>
+                                </span>
+                                <% if (user && user.username != review.username) { %>
+                                    <button class="report" onclick="report('<%= review.reviewId %>')">
+                                        <span class="material-icons">flag</span>
+                                    </button>
+                                <% } %>
+            
+                            </div>
 
-                            <% if (user && user.username != review.username) { %>
-                                <button class="report" onclick="report('<%= review.reviewId %>')">
-                                    <span class="material-icons">flag</span>
-                                </button>
-                            <% } %>
+                            <div class="review-body">
+                                <p><%= review.text %></p>
+                                <p>Rating: <%= review.rating %> Stars</p>
+                            </div>
 
+                            <div class="review-footer">
+                                <% if (user && user.username === review.username) { %>
+                                    <button class="edit" onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
+                                    <span>Modified: <%= new Date(review.dateModified).toLocaleString("en-US", { 
+                                        hour: "2-digit", minute: "2-digit", hour12: false, 
+                                        month: "short", year: "numeric" 
+                                    }) %>
+                            </span>
+                                <% } %>
+                            </div>
+                                
                             <% if(user){ %>
                             <div class="rating-container">
                                 <div class="review-rating like">
