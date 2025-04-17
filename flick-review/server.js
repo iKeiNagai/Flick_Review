@@ -110,7 +110,7 @@ app.get("/search", async (req, res) => {
 
 //sign up using firebase
 app.get("/signup", (req, res) => {
-    res.render("login");  // Renders the signup page (auth.ejs)
+    res.render("signup");  // Renders the signup page (auth.ejs)
 }).post("/signup", async (req, res) => { //post
     const { firstName, lastName, dob, username, email, password } = req.body;
     
