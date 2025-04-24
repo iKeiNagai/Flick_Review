@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= movie.title %></title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/movie.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         .rating {
@@ -55,6 +56,7 @@
 
         .report{
             all: unset;
+            margin-left: 5px;
         }
         .report:hover{
             color: red;
@@ -70,7 +72,7 @@
             <span><%= user.role %></span>
         <% } %>
 
-        <h1>Flick Review</h1>
+        <a href="/"><h1>Flick Review</h1></a>
 
         <!-- Logout or Login/Signup (Top Right) -->
         <div class="nav-links">
@@ -87,137 +89,163 @@
         </div>
     </div>
 
-    <h2><%= movie.title %></h2>
-    <div>
-        <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" alt="<%= movie.title %>">
-        <p><strong>Release Date:</strong> <%= movie.release_date %></p>
-        <p><strong>Rating:</strong> <%= movie.vote_average %>/10</p>
-        <p><%= movie.overview %></p>
+    <div class="movie-detail">
+        <div class="movie-left">
+            <h2><%= movie.title %></h2>
+            <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" alt="<%= movie.title %>">
+            <div class="movie-meta">
+                <p><strong>Release Date:</strong> <%= movie.release_date %></p>
+                <p><strong>Rating:</strong> <%= movie.vote_average %>/10</p>
+            </div>
+
+            <div class="movie-genres">
+                <h3>Genres</h3>
+                <ul>
+                    <% movie.genres.forEach(genre => { %>
+                        <li><%= genre.name %></li>
+                    <% }) %>
+                </ul>
+            </div> 
+        </div>
         
-        <h3>Genres</h3>
-        <ul>
-            <% movie.genres.forEach(genre => { %>
-                <li><%= genre.name %></li>
-            <% }) %>
-        </ul>
+        <div class="movie-overview">
+            <h3>Overview</h3>
+            <p><%= movie.overview %></p>
 
-        <h3>Reviews</h3>
-        <div id="reportForm" style="display: none;">
-            <h4>Report Review</h4>
-            
-            <form action="/report" method="POST">
-                <input type="hidden" name="movieID" value="<%= movie.id %>">
-                <input type="hidden" name="targetReviewId" id="targetReviewId">
+            <div class="reviews">
+                <h3>Add a Review</h3>
+                <form action="/review" method="POST">
+                    <input type="hidden" name="movieID" value="<%= movie.id %>">
+                    <textarea name="text" placeholder="Write a review..." required></textarea>
+                    
+                    <div class="rating">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5">&#9733;</label>
 
-                <label>
-                    <input type="radio" name="reportReason" value="inappropriate" required>
-                    Inappropriate
-                </label><br>
-                <label>
-                    <input type="radio" name="reportReason" value="spam" required>
-                    Spam
-                </label><br>
-                <label>
-                    <input type="radio" name="reportReason" value="irrelevant" required>
-                    Irrelevant
-                </label><br>
-                
-                <button type="submit">Submit</button>
-                <button onclick="hideForm()">Cancel</button>
-            </form>
-        </div>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4">&#9733;</label>
 
-        <div>
-            <% if (reviews.length > 0) { %>
-                <% reviews.forEach(review => { %>
-                    <div class="review" data-username="<%= user ? user.username : 'Guest' %>" data-review-id="<%= review.reviewId %>">
-                        
-                        <p><strong><%= review.username %> :</strong>
-                        <%= review.text %>, rating:
-                        <%= review.rating %></p>
-                        
-                        <% if (user && user.username === review.username) { %>
-                            <button onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
-                        <% } %>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3">&#9733;</label>
 
-                        <% if (user && user.username != review.username) { %>
-                            <button class="report" onclick="report('<%= review.reviewId %>')">
-                                <span class="material-icons">flag</span>
-                            </button>
-                        <% } %>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2">&#9733;</label>
 
-                        <% if(user){ %>
-                        <div class="rating-container">
-                            <div class="review-rating like">
-                                <span class="rating-button material-icons">thumb_up</span>
-                                <span class="rating-count"></span>
-                            </div>
-                            <div class="review-rating dislike">
-                                <span class="rating-button material-icons">thumb_down</span>
-                                <span class="rating-count"></span>
-                            </div>
-                        </div>
-                        <% }%>
+                        <input type="radio" id="star1" name="rating" value="1" required>
+                        <label for="star1">&#9733;</label>
                     </div>
-                <% }) %>
-            <% } else { %>
-                <p>No reviews yet. Be the first to write one!</p>
-            <% } %>
-        </div>
+                    <button type="submit">Submit</button>
+                </form>
 
-        <div id="updateReview" style="display: none;">
-            <h4>Edit Review</h4>
-
-            <form action="/edit-review" method="POST">
-                <input type="hidden" name="movieID" value="<%= movie.id %>">
-                <input type="hidden" id="reviewId" name="reviewId">
-                <textarea id="reviewText" name="text"></textarea>
-
-                <div class="rating">
-                    <input type="radio" id="star5_e" name="e_rating" value="5">
-                    <label for="star5_e">&#9733;</label>
-    
-                    <input type="radio" id="star4_e" name="e_rating" value="4">
-                    <label for="star4_e">&#9733;</label>
-    
-                    <input type="radio" id="star3_e" name="e_rating" value="3">
-                    <label for="star3_e">&#9733;</label>
-    
-                    <input type="radio" id="star2_e" name="e_rating" value="2">
-                    <label for="star2_e">&#9733;</label>
-    
-                    <input type="radio" id="star1_e" name="e_rating" value="1" required>
-                    <label for="star1_e">&#9733;</label>
+                <div id="updateReview" style="display: none;">
+                    <h4>Edit Review</h4>
+            
+                    <form action="/edit-review" method="POST">
+                        <input type="hidden" name="movieID" value="<%= movie.id %>">
+                        <input type="hidden" id="reviewId" name="reviewId">
+                        <textarea id="reviewText" name="text"></textarea>
+            
+                        <div class="rating">
+                            <input type="radio" id="star5_e" name="e_rating" value="5">
+                            <label for="star5_e">&#9733;</label>
+            
+                            <input type="radio" id="star4_e" name="e_rating" value="4">
+                            <label for="star4_e">&#9733;</label>
+            
+                            <input type="radio" id="star3_e" name="e_rating" value="3">
+                            <label for="star3_e">&#9733;</label>
+            
+                            <input type="radio" id="star2_e" name="e_rating" value="2">
+                            <label for="star2_e">&#9733;</label>
+            
+                            <input type="radio" id="star1_e" name="e_rating" value="1" required>
+                            <label for="star1_e">&#9733;</label>
+                        </div>
+            
+                        <button type="submit">Update</button>
+                        <button  class="cancel" type="button" onclick="cancelEdit()">Cancel</button>
+                    </form>
                 </div>
 
-                <button type="submit">Update</button>
-                <button type="button" onclick="cancelEdit()">Cancel</button>
-            </form>
-        </div>
-
-        <h3>Add a Review</h3>
-        <form action="/review" method="POST">
-            <input type="hidden" name="movieID" value="<%= movie.id %>">
-            <textarea name="text" placeholder="Write a review..." required></textarea>
+                <div id="reportForm" style="display: none;">
+                    <h4>Report Review</h4>
+                    
+                    <form action="/report" method="POST">
+                        <input type="hidden" name="movieID" value="<%= movie.id %>">
+                        <input type="hidden" name="targetReviewId" id="targetReviewId">
             
-            <div class="rating">
-                <input type="radio" id="star5" name="rating" value="5">
-                <label for="star5">&#9733;</label>
+                        <label>
+                            <input type="radio" name="reportReason" value="inappropriate" required>
+                            Inappropriate
+                        </label><br>
+                        <label>
+                            <input type="radio" name="reportReason" value="spam" required>
+                            Spam
+                        </label><br>
+                        <label>
+                            <input type="radio" name="reportReason" value="irrelevant" required>
+                            Irrelevant
+                        </label><br>
+                        
+                        <button type="submit">Submit</button>
+                        <button class="cancel" onclick="hideForm()">Cancel</button>
+                    </form>
+                </div>            
 
-                <input type="radio" id="star4" name="rating" value="4">
-                <label for="star4">&#9733;</label>
+                <h3>Reviews</h3>
+                <% if (reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <div class="review" data-username="<%= user ? user.username : 'Guest' %>" data-review-id="<%= review.reviewId %>">
+                            <div class="review-header">
+                                <span class="review-username"><%= review.username %></span>
+                                <span> Created: <%= new Date(review.dateCreated).toLocaleString("en-US", { 
+                                            hour: "2-digit", minute: "2-digit", hour12: false, 
+                                            month: "short", year: "numeric" 
+                                        }) %>
+                                </span>
+                                <% if (user && user.username != review.username) { %>
+                                    <button class="report" onclick="report('<%= review.reviewId %>')">
+                                        <span class="material-icons">flag</span>
+                                    </button>
+                                <% } %>
+            
+                            </div>
 
-                <input type="radio" id="star3" name="rating" value="3">
-                <label for="star3">&#9733;</label>
+                            <div class="review-body">
+                                <p><%= review.text %></p>
+                                <p>Rating: <%= review.rating %> Stars</p>
+                            </div>
 
-                <input type="radio" id="star2" name="rating" value="2">
-                <label for="star2">&#9733;</label>
-
-                <input type="radio" id="star1" name="rating" value="1" required>
-                <label for="star1">&#9733;</label>
+                            <div class="review-footer">
+                                <% if (user && user.username === review.username) { %>
+                                    <button class="edit" onclick="editReview('<%= review.reviewId %>', '<%= review.text %>', '<%= review.rating %>')">Edit</button>
+                                    <span>Modified: <%= new Date(review.dateModified).toLocaleString("en-US", { 
+                                        hour: "2-digit", minute: "2-digit", hour12: false, 
+                                        month: "short", year: "numeric" 
+                                    }) %>
+                            </span>
+                                <% } %>
+                            </div>
+                                
+                            <% if(user){ %>
+                            <div class="rating-container">
+                                <div class="review-rating like">
+                                    <span class="rating-button material-icons">thumb_up</span>
+                                    <span class="rating-count"></span>
+                                </div>
+                                <div class="review-rating dislike">
+                                    <span class="rating-button material-icons">thumb_down</span>
+                                    <span class="rating-count"></span>
+                                </div>
+                            </div>
+                            <% }%>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No reviews yet. Be the first to write one!</p>
+                <% } %>
             </div>
-            <button type="submit">Submit</button>
-        </form>
+        </div>
     </div>
 
     <script>
