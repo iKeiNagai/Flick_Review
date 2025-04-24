@@ -1,36 +1,47 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genres</title>
-</head>
-<body>
-    <h1>Hello</h1>
-</body>
-</html> -->
-
+<!-- Updated Genre Page with Clickable Movie Posters -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= genre %> Movies - Flick Review</title>
-    <link rel="stylesheet" href="/styles2.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Genre - Flick Review</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles2.css" />
 </head>
 <body>
-    <!-- Header -->
-    <div class="heading">
-        <div><img src="/images/hoho.png" alt="logo" class="logo-image"></div>
-        <div class="login-button">Login</div>
+    <div class="navbar">
+        <!-- Left: Profile and Role -->
+        <div style="display: flex; align-items: center;">
+            <% if (user) { %>
+                <a href="/profile" class="profile-btn">👤 <%= user.username %></a>
+                <span><%= user.role %></span>
+            <% } %>
+        </div>
+
+        <!-- Center: Title -->
+        <h1 style="margin-left: 80px; text-align: center;">Flick Review</h1>
+
+        <!-- Right: Links -->
+        <div class="nav-links" style="display: flex; gap: 20px; align-items: center; margin-right: 20px;">
+            <% if (user) { %>
+                <% if (user.role === 'mod') { %>
+                    <a href="/report">Reports</a>
+                <% } %>
+                <a href="/change-role">Change Role</a>
+                <a href="/logout">Logout</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            <% } %>
+        </div>
     </div>
 
     <!-- Genre Section -->
     <div class="genre-main">
-        <div class="genre-heading">
-            <div><%= genre %></div> <!-- Dynamic Genre Name -->
+        <div class="genre-heading" style="margin-top: 60px;">
+            <div><%= genre %></div>
         </div>
-        
+
         <!-- Sorting Options -->
         <div class="sort-to-right">
             <div class="sort-container">
@@ -46,11 +57,11 @@
         <div class="movie-list">
             <% if (movies.length > 0) { %>
                 <% movies.forEach(movie => { %>
-                    <div class="movie-container">
+                    <a href="/movie/<%= movie.id %>" class="movie-container">
                         <img src="<%= movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'https://via.placeholder.com/500x750?text=No+Image' %>" 
                              alt="<%= movie.title || 'Untitled' %>" class="movie-image">
                         <p class="movie-title"><%= movie.title || 'Untitled' %></p>
-                    </div>
+                    </a>
                 <% }); %>
             <% } else { %>
                 <p style="color: white;">No movies found for this genre.</p>
@@ -64,7 +75,7 @@
             const sortZA = document.querySelector('[data-sort="desc"]');
             const movieList = document.querySelector('.movie-list');
 
-            let movies = Array.from(movieList.children); // Get all movie elements
+            let movies = Array.from(movieList.children);
 
             function displayMovies(sortedMovies) {
                 movieList.innerHTML = ''; 
