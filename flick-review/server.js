@@ -152,17 +152,74 @@ app.get("/login", (req, res) => {
       res.status(500).send("Error logging in: " + error.message);
     }
   });
-  
-app.get("/profile", (req, res) => {
-    const firebaseUid = req.session.user.firebaseUid;
 
-    getUserProfile(firebaseUid, (err, user) => {
-        if (err) {
-            return res.status(500).send("Error fetching profile");
+  app.get("/profile", async (req, res) => {
+    if (!req.session.user || !req.session.user.firebase_uid) {
+        return res.redirect("/login");
+    }
+
+    const firebaseUid = req.session.user.firebase_uid;
+
+    try {
+        const userSql = `
+            SELECT username, firstName, lastName
+            FROM users 
+            WHERE firebase_uid = ?
+        `;
+        const [userRows] = await db.promise().query(userSql, [firebaseUid]);
+
+        if (!userRows.length) {
+            return res.status(404).send("User not found");
         }
+
+        const user = userRows[0];
+        user.name = `${user.firstName} ${user.lastName}`;
+
+        // Get reviews - include dateCreated in the query
+        const reviewsSql = `
+            SELECT reviewId, movieID, movieTitle, rating, text AS content, dateCreated
+            FROM reviews 
+            WHERE username = ?
+
+        `;
+        const [reviews] = await db.promise().query(reviewsSql, [user.username]);
+
+        const reviewsWithTitles = await Promise.all(
+            reviews.map(async (review) => {
+                try {
+                    const response = await axios.get(`${base_url}/movie/${review.movieID}`, {
+                        params: { api_key: process.env.API_KEY }
+                    });
+
+                    return {
+                        ...review,
+                        movieTitle: response.data.title  // Changed from movie_title to movieTitle
+                    };
+                } catch (err) {
+                    console.warn(`Could not fetch movie title for movieID ${review.movieID}`);
+                    return {
+                        ...review,
+                        movieTitle: `Unknown Title (ID ${review.movieID})`
+                    };
+                }
+            })
+        );
+
+        user.reviews = reviewsWithTitles;
+
         res.render("profile", { user });
-    });
+    } catch (err) {
+        console.error("❌ Error fetching profile manually:", err);
+        res.status(500).send("Something went wrong");
+    }
 });
+  
+  
+ 
+  
+  
+  
+
 
 // User Logout
 app.get("/logout", (req, res) => {
@@ -218,7 +275,7 @@ app.get("/movie/:id", async (req, res) => {
 });
 
 //Submit a Review
-app.post("/review", (req, res) => {
+app.post("/review", async (req, res) => {
     if (!req.session.user) {
         return res.status(401).send("You must be logged in to write a review");
     }
@@ -226,17 +283,27 @@ app.post("/review", (req, res) => {
     const { movieID, text, rating } = req.body;
     const username = req.session.user.username;
 
-    db.query("INSERT INTO reviews (username, movieID, text, rating) VALUES (?, ?, ?, ?)", 
-        [username, movieID, text, rating], 
-        (err, result) => {
-            if (err) {
-                console.error("Error submitting review:", err);
-                return res.status(500).send("Error submitting review");
-            }
-            res.redirect(`/movie/${movieID}`);
-        }
-    );
+    try {
+        // Fetch movie title from TMDB
+        const response = await axios.get(`${base_url}/movie/${movieID}`, {
+            params: { api_key: process.env.API_KEY }
+        });
+
+        const movieTitle = response.data.title;
+
+        // Save everything including the movie title
+        await db.promise().query(
+            "INSERT INTO reviews (username, movieID, movieTitle, text, rating) VALUES (?, ?, ?, ?, ?)",
+            [username, movieID, movieTitle, text, rating]
+        );
+
+        res.redirect(`/movie/${movieID}`);
+    } catch (err) {
+        console.error("Error submitting review:", err);
+        res.status(500).send("Error submitting review");
+    }
 });
+
 
 app.post("/edit-review", (req,res) =>{
     const {  movieID, reviewId, text, e_rating} = req.body;
@@ -407,6 +474,7 @@ app.get("/report", (req,res) => {
     });
 })
 
+
 app.post("/moderate", (req,res) =>{
     console.log(req.body);
 
@@ -456,6 +524,7 @@ app.post("/moderate", (req,res) =>{
 
     });
 })
+
 
 //Start Server
 if (process.env.NODE_ENV !== "test") {

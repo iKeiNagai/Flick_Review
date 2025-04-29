@@ -21,6 +21,7 @@ CREATE TABLE users (
 CREATE TABLE reviews (
     reviewId INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(45),
+    movieTitle VARCHAR(255),
     movieID INT NOT NULL,  -- TMDb Movie ID (Not a foreign key)
     text TEXT,
     rating INT,

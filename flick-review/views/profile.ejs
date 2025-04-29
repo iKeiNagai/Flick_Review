@@ -1,59 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Flick Review</title>
-    <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - Flick Review</title>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-
-    <!-- ✅ Navbar with Profile & Logout -->
-    <div class="navbar">
-        <% if (user) { %>
-            <a href="/profile" class="profile-btn">👤 <%= user.username %></a>
+  <div class="navbar">
+    <!-- Left: Profile and Role -->
+    <div style="display: flex; align-items: center;">
+      <% if (user) { %>
+        <a href="/profile" class="profile-btn">👤 <%= user.username %></a>
+        <span><%= user.role %></span>
+    <% } %>
+    </div>
+  
+    <!-- Center: Title -->
+    <a href="/"><h1>Flick Review</h1></a>
+  
+    <!-- Right: Links -->
+    <div class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+      <% if (user) { %>
+        <% if (user.role === 'mod') { %>
+          <a href="/report">Reports</a>
         <% } %>
+        <a href="/change-role">Change Role</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign Up</a>
+      <% } %>
+    </div>
+  </div>
+  
 
-        <h1>Flick Review</h1>
+  <!-- ✅ Profile Info -->
 
-        <div class="nav-links">
-            <% if (user) { %>
-                <a href="/logout">Logout</a>
-            <% } else { %>
-                <a href="/login">Login</a>
-                <a href="/signup">Sign Up</a>
-            <% } %>
-        </div>
+  <div class="profile-layout" style="margin-top: 60px;">
+
+    <div class="profile-pic">
+     
+        <img src="\images\person-icon.png" alt="Profile Picture">
     </div>
 
-    <!-- ✅ Profile Container -->
-    <div class="container">
-        <% if (user) { %>
-            <div class="profile-header">
-                <img src="<%= user.profile_picture || '/images/default-avatar.png' %>" alt="Profile Picture" class="profile-pic">
-                <h2><%= user.username %></h2>
-                <p><%= user.name %></p>
-            </div>
+    <div class="user-info">
+      <div><strong>Username:</strong> @<%= user.username %></div>
+      <div><strong>Name:</strong> <%= user.name %></div>
 
-            <!-- ✅ Past Reviews -->
-            <h2>Past Reviews</h2>
-            <div class="review-list">
-                <% if (user.reviews.length === 0) { %>
-                    <p>No reviews yet.</p>
-                <% } else { %>
-                    <% user.reviews.forEach(review => { %>
-                        <div class="review-card">
-                            <p><strong><%= review.movie_title %></strong></p>
-                            <p>Rating: ⭐ <%= review.rating %>/5</p>
-                            <p><em><%= review.content %></em></p>
-                        </div>
-                    <% }) %>
+      <!-- ✅ Profile Icon Selection -->
+    </div>
+  </div>
+
+<!-- ✅ Past Reviews -->
+<div class="reviews-section">
+    <h2>Past Reviews</h2>
+    <% if (!user.reviews || user.reviews.length === 0) { %>
+        <p>No reviews yet.</p>
+    <% } else { %>
+        <% user.reviews.forEach(review => { %>
+            <div class="review-card">
+                <h3><a href="/movie/<%= review.movieID %>"><%= review.movieTitle %></a></h3> 
+                <div class="star-rating">⭐ <%= review.rating %>/5</div>
+                <p><%= review.content %></p>
+                <% if (review.dateCreated) { %>
+                    <p>Reviewed on: <%= new Date(review.dateCreated).toLocaleString("en-US", { 
+                        hour: "2-digit", minute: "2-digit", hour12: false, 
+                        month: "short", year: "numeric" 
+                    }) %></p>
                 <% } %>
             </div>
-        <% } else { %>
-            <p>You need to <a href="/login">log in</a> to view your profile.</p>
-        <% } %>
-    </div>
+        <% }) %>
+    <% } %>
+</div>
 
 </body>
 </html>
