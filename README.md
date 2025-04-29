@@ -15,7 +15,6 @@
 - Genre-Based Filtering
 - Review System
 - Moderation System
-- Profile Customization (in-progress)
 
 ## To run
 
@@ -63,3 +62,4 @@
 - Queries Optimization
 - Movie Suggestions
 - Refactoring and Routing
+- Profile Customization
