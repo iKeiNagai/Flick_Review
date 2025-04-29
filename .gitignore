@@ -1,3 +1,5 @@
 flick-review/node_modules
 .env
 flick-review/config/firebaseServiceAccountKey.json
+# mac users only
+.DS_Store 
